@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -12,7 +14,6 @@ import (
 var config map[string]string
 
 func main() {
-
 	configFile, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		panic("could not open config file")
@@ -21,14 +22,19 @@ func main() {
 	if err != nil {
 		panic("could not parse json from config file")
 	}
-
+		
+	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request){
+		io.WriteString(w, "wElcOme to MOckErYboT")
+	})
 	http.HandleFunc("/api/telegram", telegramHandler)
 	http.HandleFunc("/api/slack", slackHandler)
 	http.HandleFunc("/api/discord", discordHandler)
 	http.HandleFunc("/api/wire", wireHandler)
 	http.HandleFunc("/api/signal", signalHandler)
 	http.HandleFunc("/api/matrix", matrixHandler)
-	_ = http.ListenAndServe(":80", nil)
+
+	fmt.Println("Listening on port " + string(config["port"]))
+	_ = http.ListenAndServe(":"+config["port"], nil)
 }
 
 func convertToMockery(str string) string {
@@ -43,3 +49,4 @@ func convertToMockery(str string) string {
 	}
 	return string(convertedStr)
 }
+
