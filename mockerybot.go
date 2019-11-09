@@ -1,19 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
-	"time"
-	"unicode"
 )
 
-var config map[string]string
 
-func main() {
+
+func initListeners(ctx context.Context, name lambdaEvent) (string, error) {
 	configFile, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		panic("could not open config file")
@@ -41,17 +39,3 @@ func main() {
 	fmt.Println("Listening on port " + string(config["port"]))
 
 }
-
-func convertToMockery(str string) string {
-	var convertedStr []rune
-	for i := 0; i < len(str); i++ {
-		rand.Seed(time.Now().UnixNano())
-		if rand.Intn(2) != 0 {
-			convertedStr = append(convertedStr, unicode.ToUpper(rune(str[i])))
-		} else {
-			convertedStr = append(convertedStr, unicode.ToLower(rune(str[i])))
-		}
-	}
-	return string(convertedStr)
-}
-
