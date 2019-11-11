@@ -1,4 +1,4 @@
-	package main
+package main
 
 import (
 	"context"
@@ -26,13 +26,22 @@ func telegramLambda(ctx context.Context, event map[string]interface{}) (events.A
 		return events.APIGatewayProxyResponse{Body: "Error: failed to parse JSON from request", StatusCode: 500}, err
 	}
 		
-	if msg.Message.ReplyToMessage != nil && msg.Message.Command() == "mock" {
-		bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
-		replyMsg := mockery.ConvertToMockery(msg.Message.ReplyToMessage.Text)
-		newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
-		bot.Send(newMsg)
+	if msg.Message.ReplyToMessage != (tgbotapi.Message{}.ReplyToMessage) {
 
-	} else if msg.Message.IsCommand() {
+		if msg.Message.Command() == "mock" {
+			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
+			replyMsg := mockery.ConvertToMockery(msg.Message.ReplyToMessage.Text)
+			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
+			bot.Send(newMsg)
+
+		} else if msg.Message.Command() == "apologize" {
+			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
+			replyMsg := mockery.ConvertToMockery( mockery.MakeApology(msg.Message.ReplyToMessage.From.UserName) )
+			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
+			bot.Send(newMsg)
+		}
+		
+	} else {
 
 		if msg.Message.Command() == "mock" {
 			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
@@ -42,7 +51,7 @@ func telegramLambda(ctx context.Context, event map[string]interface{}) (events.A
 			
 		} else if msg.Message.Command() == "apologize" {
 			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
-			replyMsg := mockery.ConvertToMockery("I'm sorry, " + msg.Message.CommandArguments() )
+			replyMsg := mockery.ConvertToMockery( mockery.MakeApology(msg.Message.CommandArguments()) )
 			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
 			bot.Send(newMsg)
 		}
