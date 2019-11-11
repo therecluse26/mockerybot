@@ -29,34 +29,37 @@ func telegramLambda(ctx context.Context, event map[string]interface{}) (events.A
 	if msg.Message.ReplyToMessage != (tgbotapi.Message{}.ReplyToMessage) {
 
 		if msg.Message.Command() == "mock" {
-			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
-			replyMsg := mockery.ConvertToMockery(msg.Message.ReplyToMessage.Text)
-			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
-			bot.Send(newMsg)
+
+			newMsg = botReply(msg.Message.Chat.ID, msg.Message.ReplyToMessage.Text)
 
 		} else if msg.Message.Command() == "apologize" {
-			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
-			replyMsg := mockery.ConvertToMockery( mockery.MakeApology(msg.Message.ReplyToMessage.From.UserName) )
-			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
-			bot.Send(newMsg)
+
+			newMsg = botReply(msg.Message.Chat.ID, mockery.MakeApology(msg.Message.ReplyToMessage.From.UserName))
+
 		}
 		
 	} else {
 
 		if msg.Message.Command() == "mock" {
-			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
-			replyMsg := mockery.ConvertToMockery(msg.Message.CommandArguments())
-			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
-			bot.Send(newMsg)
-			
+
+			newMsg = botReply(msg.Message.Chat.ID, msg.Message.CommandArguments())
+
 		} else if msg.Message.Command() == "apologize" {
-			bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
-			replyMsg := mockery.ConvertToMockery( mockery.MakeApology(msg.Message.CommandArguments()) )
-			newMsg = tgbotapi.NewMessage(msg.Message.Chat.ID, replyMsg)
-			bot.Send(newMsg)
+
+			newMsg = botReply(msg.Message.Chat.ID, mockery.MakeApology(msg.Message.CommandArguments()))
+
 		}
 	} 
 
+	// Necessary to clear out pending updates queue in webhook
 	return events.APIGatewayProxyResponse{Body: newMsg.Text, StatusCode: 200}, nil
+}
 
+// Actually sends response to Telegram API
+func botReply(chatId int64, sourceMsg string) tgbotapi.MessageConfig {
+	bot, _ := tgbotapi.NewBotAPI(config["apiKey"])
+	replyMsg := mockery.ConvertToMockery(sourceMsg)
+	newMsg := tgbotapi.NewMessage(chatId, replyMsg)
+	bot.Send(newMsg)
+	return newMsg
 }
