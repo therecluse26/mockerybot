@@ -30,3 +30,7 @@ func ConvertToMockery(str string) string {
 	}
 	return string(convertedStr)
 }
+
+func CreateApology(name string) string {
+	return ""
+}

@@ -1,5 +1,5 @@
 package main
-
+/*
 import (
 	"context"
 	"fmt"
@@ -39,3 +39,5 @@ func initListeners(ctx context.Context, name lambdaEvent) (string, error) {
 	fmt.Println("Listening on port " + string(config["port"]))
 
 }
+
+*/
