@@ -29,25 +29,19 @@ func telegramLambda(ctx context.Context, event map[string]interface{}) (events.A
 	if msg.Message.ReplyToMessage != (tgbotapi.Message{}.ReplyToMessage) {
 
 		if msg.Message.Command() == "mock" {
-
 			newMsg = botReply(msg.Message.Chat.ID, msg.Message.ReplyToMessage.Text)
 
 		} else if msg.Message.Command() == "apologize" {
-
 			newMsg = botReply(msg.Message.Chat.ID, mockery.MakeApology(msg.Message.ReplyToMessage.From.UserName))
-
 		}
 		
 	} else {
 
 		if msg.Message.Command() == "mock" {
-
 			newMsg = botReply(msg.Message.Chat.ID, msg.Message.CommandArguments())
 
 		} else if msg.Message.Command() == "apologize" {
-
 			newMsg = botReply(msg.Message.Chat.ID, mockery.MakeApology(msg.Message.CommandArguments()))
-
 		}
 	} 
 
